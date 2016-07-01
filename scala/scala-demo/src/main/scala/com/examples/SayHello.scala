@@ -1,38 +1,39 @@
 package com.examples
 
+import scala.util.Random
+import scala.collection.mutable.ArrayBuffer
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
+import org.apache.spark.storage.StorageLevel
 import org.apache.log4j.Logger
 
+
+case class Info(name:String, age:Int, addr:String)
 object SayHello {
   def main(arg: Array[String]) {
     var logger = Logger.getLogger(this.getClass())
 
-    if (arg.length < 2) {
-      logger.error("=> wrong parameters number")
-      System.err.println("Usage: SayHello <path-to-files> <output-path>")
-      System.exit(1)
+    val jobName = "SayHello"
+    val conf = new SparkConf().setAppName(jobName)
+    conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+    conf.registerKryoClasses(Array(classOf[Info]))
+
+    val sc = new SparkContext(conf)
+    val arr = new ArrayBuffer[Info]()
+    val nameArr = Array[String]("xyz", "abc", "efg")
+    val addrArr = Array[String]("beijing", "shanghai", "jinan", "tianjin")
+    
+    for (i <- 1 to 100000) {
+	val name = nameArr(Random.nextInt(3))
+        val age = Random.nextInt(100)
+        val address = addrArr(Random.nextInt(4))
+	arr += (Info(name, age, address))
     }
 
-    val jobName = "SayHello"
-
-    val conf = new SparkConf().setAppName(jobName)
-    val sc = new SparkContext(conf)
-
-    val pathToFiles = arg(0)
-    val outputPath = arg(1)
-
-    logger.info("=> jobName \"" + jobName + "\"")
-    logger.info("=> pathToFiles \"" + pathToFiles + "\"")
-
-    val files = sc.textFile(pathToFiles)
-
-    // do your work here
-    val rowsWithoutSpaces = files.map(_.replaceAll(" ", ","))
-
-    // and save the result
-    rowsWithoutSpaces.saveAsTextFile(outputPath)
-
+    val rdd = sc.parallelize(arr)
+    rdd.persist(StorageLevel.MEMORY_ONLY_SER)
+    rdd.count()
+    rdd.collect().foreach(println)
   }
 }
