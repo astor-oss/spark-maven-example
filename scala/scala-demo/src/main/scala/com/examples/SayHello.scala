@@ -32,7 +32,8 @@ object SayHello {
     }
 
     val rdd = sc.parallelize(arr)
-    rdd.persist(StorageLevel.MEMORY_ONLY_SER)
+    rdd.cache()
+    // rdd.persist(StorageLevel.MEMORY_ONLY_SER)
     rdd.count()
     rdd.collect().foreach(println)
   }

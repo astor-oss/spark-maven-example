@@ -1,0 +1,16 @@
+
+object Student {
+  private var studentNo:Int=0;
+  def uniqueStudentNo()={
+    studentNo+=1
+    studentNo
+  }
+}
+
+
+object MainObject {
+    def main(args: Array[String]): Unit = {
+        // println(Student.uniqueStudentNo())
+	println("xxxxxxxxxxxxxx")
+    }
+}
