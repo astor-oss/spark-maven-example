@@ -1,0 +1,4 @@
+
+scalac student.scala
+javac JavaUseScalaGeneric.java
+java JavaUseScalaGeneric

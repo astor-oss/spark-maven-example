@@ -1,16 +1,29 @@
-class A
-class B extends A{
-  //同java一样，采用@+注解关键字对方法、变量
-  //类等进行注解标识
-  //下面的注解用于标识getName方法在未来会被丢弃
-  //不推荐使用
-  @deprecated def getName()="Class B"
+import java.io.File
+import java.io.ObjectOutputStream
+import java.io.FileOutputStream
+import java.io.ObjectInputStream
+import java.io.FileInputStream
+
+//@serializable
+class Person{
+  // @transient注解声明后，成员变量不会被充列化
+  @transient var name:String="zzh"
+  var age:Int=0
+  override def toString()="name="+name+" age="+age
 }
 
-object AnnotationDemo{
+object Serialize {
   def main(args: Array[String]): Unit = {
-    var b=new B()
-    //在调用的时候，编译器出给出相应提示
-    b.getName()
+     val file = new File("person.out")
+     val oout = new ObjectOutputStream(new FileOutputStream(file)) 
+     val person = new Person 
+     oout.writeObject(person)  
+     oout.close()
+
+     val oin = new ObjectInputStream(new FileInputStream(file)) 
+     val newPerson = oin.readObject()
+     oin.close();  
+     println(newPerson)
+     //println(newPerson.name + " " + newPerson.age)
   }
 }

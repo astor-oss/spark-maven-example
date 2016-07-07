@@ -1,0 +1,4 @@
+
+javac JavaWildcardGeneric.java
+scalc ScalaMain.scala
+scala ScalaMain
