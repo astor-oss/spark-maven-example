@@ -1,0 +1,25 @@
+package com.package
+import org.apache.spark.SparkContext
+import org.apache.spark.storage.StorageLevel
+import org.apache.spark.streaming.{Seconds, StreamingContext}
+
+
+object NetworkWordCnt {
+    def main(args:Array[String]):Unit = {
+	if (args.length < 2) {
+	    System.err.prinln("Usage com.package.NetworkWordCnt hostname port")
+	    System.exit(-1)
+	}
+
+	val sparkConf = new SparkConf().setAppName("NetWorkWordCnt")
+	val ssc = new StreamingContext(sparkConf, Seconds(1))
+
+	val lines = ssc.socketTextStream(args(0), args(1).toInt, StorageLevel.MEMORY_AND_DISK_SER)
+	val words = lines.map(_.split(" "))
+	val counts = words.map((_,1)).reduceByKey(_ + _)
+	counts.print()
+
+	ssc.start()
+	ssc.awaitTermination()
+    }
+}
